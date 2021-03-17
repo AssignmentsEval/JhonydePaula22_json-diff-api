@@ -1,0 +1,172 @@
+openapi: "3.0.0"
+
+info:
+  description: REST API for store and diff Base64 encoded json data
+  version: "1.0.0"
+  title: WAES assignment - Scalable Web
+  contact:
+    email: jonathanpaula22@gmail.com
+    url: https://www.linkedin.com/in/jonathan-de-paula/?locale=en_US
+
+
+tags:
+  - name: Retrieve Data Endpoint
+    description: Endpoint to get the differencies between two JSONs
+  - name: Input Data Endpoint
+    description: Endpoint to input JSON data
+
+
+paths:
+  /v1/diff/{id}:
+    get:
+      tags:
+        - Retrieve Data Endpoint
+      summary: Method to handle GET requests. Returns a record composed by two JSONs and demonstrate diff result based on the provided ID
+      operationId: verifyDiff
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiffResultDTO"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDTO"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDTO"
+
+  /v1/diff/{id}/{side}:
+    post:
+      tags:
+        - Input Data Endpoint
+      summary: Method to handle POST requests. Persists a JSON in a record, to later be diff-ed
+      operationId: saveJson
+      parameters:
+        - $ref: "#/components/parameters/id"
+        - $ref: "#/components/parameters/side"
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              $ref: "#/components/schemas/JsonDTO"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JsonDTO"
+      responses:
+        204:
+          description: No Content
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDTO"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDTO"
+
+components:
+
+  parameters:
+    id:
+      name: id
+      in: path
+      schema:
+        type: string
+        example: "d184e0c9-c80c-4918-a8c1-c4e24c6b32cb"
+      required: true
+      description: ID of the record
+
+    side:
+      name: side
+      in: path
+      schema:
+        $ref: "#/components/schemas/SideEnum"
+      required: true
+      description: Side that the JSON must be saved on the record
+
+  schemas:
+
+    DiffResultDTO:
+      type: object
+      description: Object that represents the diffs between the JSONs, if there is any difference
+      required:
+        - result
+      properties:
+        result:
+          $ref: "#/components/schemas/DiffResultEnum"
+        diffs:
+          type: array
+          nullable: true
+          title: Diffs between the JSONs
+          items:
+            $ref: "#/components/schemas/DiffsDTO"
+
+    DiffResultEnum:
+      type: string
+      description: Enum to demonstrate if the JSONs are equal or not
+      nullable: false
+      enum:
+        - EQUAL
+        - NOT_EQUAL
+        - DIFFERENT_LENGHT
+      example: EQUAL
+
+    DiffsDTO:
+      type: object
+      description: Actual differencies between the JSONs
+      required:
+        - offset
+        - length
+      properties:
+        offset:
+          type: integer
+          nullable: false
+          example: 1
+        length:
+          type: integer
+          nullable: false
+          example: 2
+
+    JsonDTO:
+      type: string
+      nullable: false
+      format: byte
+      description: Base64 Encoded Json to be stored and later compared
+      example: "eyJ0ZXNiIjp0cnVlfQ=="
+
+    SideEnum:
+      type: string
+      description: Side of where the JSON must be stored on the data base
+      nullable: false
+      enum:
+        - right
+        - left
+      example: right
+
+    ErrorDTO:
+      type: object
+      description: Erro Object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          title: Message
+          nullable: false
+          description: Description of possible errors that ocurred while performing some action
+          example: "Error description"
