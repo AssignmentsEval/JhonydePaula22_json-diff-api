@@ -3,7 +3,7 @@ WAES Test - Assignment Scalable Web
 
 #### Small context
 
-It is a REST API responsible to store and compare Base64 encoded JSON.
+It is a REST API responsible for storing and comparing Base64 encoded JSON.
 
 #### API Instructions
 
@@ -18,7 +18,7 @@ To get the differences between the JSONs, both sides (left and right) must be pr
 
 For more detailed info access the [Swagger](http://localhost:8080/swagger-ui.html) after running the project.
 
-It is also possible to generate the last version of Javadoc. Just run the command below and the java doc will be available on the [apidocs folder](target/site/apidocs/index.html)
+It is also possible to generate the last version of Javadoc. Just run the command below and the java doc will be available on the [target folder](target/site/apidocs/index.html)
 > mvn javadoc:javadoc
 
 #### Languages / Frameworks / Tools
@@ -40,7 +40,7 @@ It is also possible to generate the last version of Javadoc. Just run the comman
 
 # Running the project
 
-#### Compiling (needed to generate classes) and Running
+#### Compiling and Running the project
 
  On the project's folder, run the command below to compile and start the application.
  > mvn clean spring-boot:run
@@ -67,7 +67,7 @@ The Jacoco report will be generated and available on the [target folder](target/
 
 # Project Info
 
-I have used Spring Boot to build this REST api.
+I have used Spring Boot to build this REST API.
 I have decided to divide the project into three layers of responsibility. 
 Following the KISS principle, I have tried to keep the project as simple as possible.
 I also tried to follow the clean code principles, which I in my opinion makes it very easy for other developers to understand my code, and also to increase the maintainability of the code.  
@@ -85,7 +85,7 @@ We have three layers in this project:
 5. Swagger Code Gen - The API first strategy is being used a lot among the developers, and it avoids having to create tons of code.
 6. Comments - I think that a well-written code must not have comments unless it is not that simple to explain. It must be understandable by itself. With that in mind, I did not add too many comments over the code while coding this assignment, except by the JavaDoc comments.
 7. Swagger - There is no need for further explanation.
-8. Exclusions on coverage - I have excluded the JsonDiffApiApplication, Auto Generated Models (Simple POJOs) and all the Constants files from Jacoco coverage, since those classes are not meant to be tested. Anyway, JsonDiffApiApplication is tested when we set up the Spring Boot context while running the integration tests.  
+8. Exclusions on coverage - I have excluded the JsonDiffApiApplication, Auto-Generated Models (Simple POJOs), and all the Constants files from Jacoco coverage, since those classes are not meant to be tested. Anyway, JsonDiffApiApplication is tested when we set up the Spring Boot context while running the integration tests.  
 
 
 #### Improvement Suggestions
@@ -93,4 +93,4 @@ We have three layers in this project:
 1. Return the actual difference between the JSONS
 2. Add circuit-breaker to increase the application resilience (Could make usage of the resilience4j). I would add that while trying to request the database. If for some reason the database is out of service, we would give it a proper time to recover without keep sending tons of additional requests.
 3. Add Cache (local or shared if it is in a cloud scalable environment) to avoid requests that have already been made and had no changes so far to keep hitting the database. Of course, we would have to add some mechanism to handle the cache invalidation whenever a new change was made on the JsonRecord.
-4. Add a file to handle the messages properties in case of need for internationalization. As it is not needed right now, I left the messages in some constant files. It can be easily changed since it is now encapsulated. 
+4. Add a file to handle message properties in case of need for internationalization. As it is not needed right now, I left the messages in some constant files. 
