@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.waes.test.jsondiffapi.service.impl.JsonRecordDiffServiceImplTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s - in com.waes.test.jsondiffapi.service.impl.JsonRecordDiffServiceImplTest

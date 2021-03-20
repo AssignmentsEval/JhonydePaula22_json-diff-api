@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonRecordDiffServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json-diff-api</a> &gt; <a href="index.source.html" class="el_package">com.waes.test.jsondiffapi.service.impl</a> &gt; <span class="el_source">JsonRecordDiffServiceImpl.java</span></div><h1>JsonRecordDiffServiceImpl.java</h1><pre class="source lang-java linenums">package com.waes.test.jsondiffapi.service.impl;
+
+import com.waes.test.jsondiffapi.exception.JsonDataNotPresentException;
+import com.waes.test.jsondiffapi.exception.JsonRecordNotFoundException;
+import com.waes.test.jsondiffapi.model.entity.JsonRecord;
+import com.waes.test.jsondiffapi.repository.JsonRecordRepository;
+import com.waes.test.jsondiffapi.service.JsonRecordDiffService;
+import com.waes.test.model.DiffResultDTO;
+import com.waes.test.model.DiffsDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.waes.test.jsondiffapi.constants.AppLogMessagesConstants.DIFFS_RESULT_DTO_LOG_MESSAGE;
+import static com.waes.test.jsondiffapi.constants.AppLogMessagesConstants.JSON_RECORD_RETRIEVED_LOG_MESSAGE;
+import static com.waes.test.jsondiffapi.constants.ExceptionConstants.LEFT_JSON_NOT_PRESENT_EXCEPTION_MESSAGE;
+import static com.waes.test.jsondiffapi.constants.ExceptionConstants.RIGHT_JSON_NOT_PRESENT_EXCEPTION_MESSAGE;
+import static com.waes.test.model.DiffResultEnum.DIFFERENT_LENGHT;
+import static com.waes.test.model.DiffResultEnum.EQUAL;
+import static com.waes.test.model.DiffResultEnum.NOT_EQUAL;
+import static java.lang.Integer.MIN_VALUE;
+
+/**
+ * JsonRecordDiffServiceImpl implements {@link JsonRecordDiffService}
+ * Performs operations related to finding the differences in two Jsons Data stored in a {@link JsonRecord} into the database
+ *
+ * @author Jonathan de Paula
+ */
+@Service
+<span class="fc" id="L33">@RequiredArgsConstructor</span>
+<span class="fc" id="L34">@Slf4j</span>
+public class JsonRecordDiffServiceImpl implements JsonRecordDiffService {
+
+    private final JsonRecordRepository jsonRecordRepository;
+
+    /**
+     * Perform the operations needed to find the differences.
+     *
+     * @param id {@link String}
+     * @return {@link DiffResultDTO}
+     */
+    @Override
+    public DiffResultDTO getJsonDiffs(final String id) {
+<span class="fc" id="L47">        final JsonRecord jsonRecord = getJsonRecord(id);</span>
+<span class="fc" id="L48">        validateIfJsonDataIsPresentOnBothSides(jsonRecord);</span>
+<span class="fc" id="L49">        return generateDiffResultDTO(jsonRecord);</span>
+    }
+
+    /**
+     * Search for a {@link JsonRecord} on the data base.
+     *
+     * @param id {@link String}
+     * @return {@link JsonRecord}
+     */
+    private JsonRecord getJsonRecord(final String id) {
+<span class="fc" id="L59">        JsonRecord jsonRecord = jsonRecordRepository.findById(id).orElseThrow(() -&gt; new JsonRecordNotFoundException(&quot;No Json record was found. Try again with a valid ID&quot;));</span>
+<span class="fc" id="L60">        log.info(JSON_RECORD_RETRIEVED_LOG_MESSAGE, jsonRecord);</span>
+<span class="fc" id="L61">        return jsonRecord;</span>
+    }
+
+    /**
+     * Validate if a {@link JsonRecord} contains Json Data in both sides.
+     *
+     * @param jsonRecord {@link JsonRecord}
+     */
+    private void validateIfJsonDataIsPresentOnBothSides(final JsonRecord jsonRecord) {
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (jsonRecord.isLeftSideNull()) {</span>
+<span class="fc" id="L71">            throw new JsonDataNotPresentException(LEFT_JSON_NOT_PRESENT_EXCEPTION_MESSAGE);</span>
+        }
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (jsonRecord.isRightSideNull()) {</span>
+<span class="fc" id="L74">            throw new JsonDataNotPresentException(RIGHT_JSON_NOT_PRESENT_EXCEPTION_MESSAGE);</span>
+        }
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Generate the {@link DiffResultDTO} accordingly with the data present into the {@link JsonRecord}
+     *
+     * @param jsonRecord {@link JsonRecord}
+     * @return {@link DiffResultDTO}
+     */
+    private DiffResultDTO generateDiffResultDTO(final JsonRecord jsonRecord) {
+        final DiffResultDTO diffResultDTO;
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (jsonRecord.jsonsAreDifferentInLength()) {</span>
+<span class="fc" id="L88">            diffResultDTO = new DiffResultDTO().result(DIFFERENT_LENGHT);</span>
+        } else {
+<span class="fc" id="L90">            List&lt;DiffsDTO&gt; diffsDTOList = findDiffs(jsonRecord);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">            diffResultDTO = diffsDTOList.isEmpty() ?</span>
+<span class="fc" id="L92">                    new DiffResultDTO().result(EQUAL) :</span>
+<span class="fc" id="L93">                    new DiffResultDTO().result(NOT_EQUAL).diffs(findDiffs(jsonRecord));</span>
+        }
+<span class="fc" id="L95">        log.info(DIFFS_RESULT_DTO_LOG_MESSAGE, diffResultDTO, jsonRecord);</span>
+<span class="fc" id="L96">        return diffResultDTO;</span>
+    }
+
+    /**
+     * This method contains the logic that find the differences between to Jsons that are stored in a {@link JsonRecord}.
+     *
+     * @param jsonRecord {@link JsonRecord}
+     * @return {@link List&lt;DiffsDTO&gt;}
+     */
+    private List&lt;DiffsDTO&gt; findDiffs(final JsonRecord jsonRecord) {
+<span class="fc" id="L106">        final List&lt;DiffsDTO&gt; diffsDTOList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L108">        int offset = MIN_VALUE;</span>
+<span class="fc" id="L109">        int lenght = 1;</span>
+
+        // This will be the index that will control the iteration over the bytes on the arrays
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        for (int i = 0; i &lt; jsonRecord.getLeft_json().length; i++) {</span>
+            // if in the same index, both bytes are equals
+<span class="fc bfc" id="L114" title="All 2 branches covered.">            if (jsonRecord.getLeft_json()[i] == jsonRecord.getRight_json()[i]) {</span>
+                // than, if we are not counting the length of a previous mismatched byte we continue to the next index.
+<span class="fc bfc" id="L116" title="All 2 branches covered.">                if (offset &lt; 0) {</span>
+<span class="fc" id="L117">                    continue;</span>
+                }
+                //if we are counting we add the offset and length to the DiffDTOlist, reset the offset and length, than we continue to the next index.
+<span class="fc" id="L120">                diffsDTOList.add(new DiffsDTO().offset(offset).length(lenght));</span>
+<span class="fc" id="L121">                offset = MIN_VALUE;</span>
+<span class="fc" id="L122">                lenght = 1;</span>
+<span class="fc" id="L123">                continue;</span>
+            }
+
+            // if in the same index, both bytes are not equals and we are not counting the length yet, we set the offset as the current index and continue to the next index to calculate the length of the differences
+<span class="fc bfc" id="L127" title="All 2 branches covered.">            if (offset &lt; 0) {</span>
+<span class="fc" id="L128">                offset = i;</span>
+<span class="fc" id="L129">                continue;</span>
+            }
+
+            // if we are already counting we just increase the length of the differences.
+<span class="fc" id="L133">            lenght++;</span>
+        }
+
+<span class="fc" id="L136">        return diffsDTOList;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

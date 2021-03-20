@@ -1,0 +1,6 @@
+com/waes/test/jsondiffapi/controller/JsonOperationsControllerTest.class
+com/waes/test/jsondiffapi/service/impl/JsonRecordServiceImplTest.class
+com/waes/test/jsondiffapi/service/impl/JsonRecordDiffServiceImplTest.class
+com/waes/test/jsondiffapi/model/entity/JsonRecordTest.class
+com/waes/test/jsondiffapi/TestConstants.class
+com/waes/test/jsondiffapi/controller/RestExceptionHandlerControllerTest.class

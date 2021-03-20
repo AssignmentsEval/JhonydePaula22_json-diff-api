@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonOperationsController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json-diff-api</a> &gt; <a href="index.source.html" class="el_package">com.waes.test.jsondiffapi.controller</a> &gt; <span class="el_source">JsonOperationsController.java</span></div><h1>JsonOperationsController.java</h1><pre class="source lang-java linenums">package com.waes.test.jsondiffapi.controller;
+
+import com.waes.test.api.V1Api;
+import com.waes.test.jsondiffapi.controller.propertyeditorsupport.SideEnumPropertyEditorSupport;
+import com.waes.test.jsondiffapi.service.JsonRecordDiffService;
+import com.waes.test.jsondiffapi.service.JsonRecordService;
+import com.waes.test.model.DiffResultDTO;
+import com.waes.test.model.SideEnum;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+/**
+ * REST Controller to handle Json Record Endpoints
+ *
+ * @author Jonathan de Paula
+ */
+@RestController
+<span class="fc" id="L23">@RequiredArgsConstructor</span>
+public class JsonOperationsController implements V1Api {
+
+    private final JsonRecordService jsonRecordService;
+    private final JsonRecordDiffService jsonRecordDiffService;
+
+    /**
+     * POST Method to save a Json Data into a Json Record in the database
+     *
+     * @param body Base64 Encoded String converted to byte[]
+     * @param id   {@link String} Identification of the Json Record
+     * @param side {@link SideEnum} Side where the Json Data must be stored
+     * @return {@link ResponseEntity}
+     */
+    @Override
+    public ResponseEntity&lt;Void&gt; saveJson(@Valid byte[] body, String id, SideEnum side) {
+<span class="fc" id="L39">        jsonRecordService.save(id, side, body);</span>
+<span class="fc" id="L40">        return ResponseEntity.noContent().build();</span>
+    }
+
+    /**
+     * GET Method to retrieve the differences between the Json Data inside a Json Record
+     *
+     * @param id {@link String}
+     * @return {@link ResponseEntity} of {@link DiffResultDTO}
+     */
+    @Override
+    public ResponseEntity&lt;DiffResultDTO&gt; verifyDiff(String id) {
+<span class="fc" id="L51">        return ResponseEntity.ok(jsonRecordDiffService.getJsonDiffs(id));</span>
+    }
+
+    /**
+     * Registering PropertyEditor to handle SideEnum type
+     * Used to customize the way that the requests will be sent to the controller.
+     * In this particular case, changing how the SideEnum is read from the requests.
+     *
+     * @param webdataBinder {@link WebDataBinder}
+     */
+    @InitBinder
+    private void initBinder(final WebDataBinder webdataBinder) {
+<span class="fc" id="L63">        webdataBinder.registerCustomEditor(SideEnum.class, new SideEnumPropertyEditorSupport());</span>
+<span class="fc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

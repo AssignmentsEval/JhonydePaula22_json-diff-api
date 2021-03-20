@@ -1,0 +1,6 @@
+/workspaces/JhonydePaula22_json-diff-api/src/test/java/com/waes/test/jsondiffapi/TestConstants.java
+/workspaces/JhonydePaula22_json-diff-api/src/test/java/com/waes/test/jsondiffapi/service/impl/JsonRecordServiceImplTest.java
+/workspaces/JhonydePaula22_json-diff-api/src/test/java/com/waes/test/jsondiffapi/service/impl/JsonRecordDiffServiceImplTest.java
+/workspaces/JhonydePaula22_json-diff-api/src/test/java/com/waes/test/jsondiffapi/controller/RestExceptionHandlerControllerTest.java
+/workspaces/JhonydePaula22_json-diff-api/src/test/java/com/waes/test/jsondiffapi/model/entity/JsonRecordTest.java
+/workspaces/JhonydePaula22_json-diff-api/src/test/java/com/waes/test/jsondiffapi/controller/JsonOperationsControllerTest.java
